@@ -78,56 +78,32 @@ function send_message(){
 
 function Register_Event(){
     $con = Connect_Database();
-    $userName = $_SESSION['user_name'];
+    echo "ok";
+    $EventID = intval($_POST['EventID']);
+    $UserName = htmlspecialchars($_POST['UserName']);
+    $UserEmail = htmlspecialchars($_POST['UserEmail']);
+    echo $UserEmail + "oomo";
+    echo $UserName;
+    $UserID = $_SESSION['user_id'] ?? null;
+    echo $UserID;
+    if ($UserID && $EventID) {
+        $con = Connect_Database();
+        echo "ok";
 
-    $getIdQuery = "SELECT UserID FROM Users WHERE UserName = ?";
-    $stmt = mysqli_prepare($con, $getIdQuery);
-    mysqli_stmt_bind_param($stmt, "s", $userName);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
+        // Prepare and execute the query to insert participation details
+        $query = "INSERT INTO Participations (UserID, EventID) VALUES (?, ?)";
+        $stmt = mysqli_prepare($con, $query);
+        mysqli_stmt_bind_param($stmt, "ii", $UserID, $EventID);
 
-    if ($row = mysqli_fetch_assoc($result)) {
-        $userID = $row['UserID']; 
-    } else {
-        echo "<script>alert('User not found. Please log in again.'); window.location.href = '../index.php';</script>";
-        exit;
+        if (mysqli_stmt_execute($stmt)) {
+            echo "<script>alert('Registration successful!'); window.location.href = 'index.php';</script>";
+        } else {
+            echo "<script>alert('Error registering for the event. Please try again.'); window.location.href = 'index.php';</script>";
+        }
+
+        mysqli_stmt_close($stmt);
+        mysqli_close($con);}
     }
-    if (!isset($_SESSION['user_id'])) {
-        echo "<script>alert('Please log in to register for events.'); window.location.href = '../index.php';</script>";
-        exit;
-    }
-
-    $userID = $_SESSION['user_id']; // User ID from the session
-    $eventID = intval($_POST['EventID']); // Event ID from the form submission
-
-    $con = Connect_Database();
-
-    $checkQuery = "SELECT * FROM participation WHERE UserID = ? AND EventID = ?";
-    $checkStmt = mysqli_prepare($con, $checkQuery);
-    mysqli_stmt_bind_param($checkStmt, "ii", $userID, $eventID);
-    mysqli_stmt_execute($checkStmt);
-    $result = mysqli_stmt_get_result($checkStmt);
-
-    if (mysqli_num_rows($result) > 0) {
-        echo "<script>alert('You are already registered for this event.'); window.location.href = '../menu.php';</script>";
-        exit;
-    }
-
-    // Insert the registration into the `participation` table
-    $query = "INSERT INTO participation (UserID, EventID) VALUES (?, ?)";
-    $stmt = mysqli_prepare($con, $query);
-    mysqli_stmt_bind_param($stmt, "ii", $userID, $eventID);
-
-    if (mysqli_stmt_execute($stmt)) {
-        echo "<script>alert('Registration successful!'); window.location.href = '../menu.php';</script>";
-    } else {
-        echo "<script>alert('Failed to register. Please try again.'); window.location.href = '../menu.php';</script>";
-    }
-
-    mysqli_stmt_close($stmt);
-    mysqli_close($con);
-}
-
 
 
 
