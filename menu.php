@@ -1,7 +1,7 @@
 <?php 
 session_start();
 require('./serverScript/Logic.php');
-$name = $ $_SESSION['user_name'] ;
+$name = $_SESSION['user_name'] ;
 ?>
 
 <!DOCTYPE html>
@@ -31,7 +31,7 @@ $name = $ $_SESSION['user_name'] ;
             <li><a href="#events" class="text-white hover:text-blue-400 flex items-center"><i class="fas fa-calendar-alt mr-2"></i> Events</a></li>
             <li><a href="#about" class="text-white hover:text-blue-400 flex items-center"><i class="fas fa-info-circle mr-2"></i> About</a></li>
             <li><a href="#contact" class="text-white hover:text-blue-400 flex items-center"><i class="fas fa-envelope mr-2"></i> Contact</a></li>
-            <li><a href="./serverScript/logout.php" class="text-white hover:text-blue-400 flex items-center"><i class="fas fa-sign-out-alt mr-2"></i> Logout</a></li>
+            <li><a href="./logout.php" class="text-white hover:text-blue-400 flex items-center"><i class="fas fa-sign-out-alt mr-2"></i> Logout</a></li>
         </ul>
     </div>
 </nav>
@@ -46,19 +46,83 @@ $name = $ $_SESSION['user_name'] ;
         </div>
     </section>
 
+
+  
+
+
+
     <section id="events" class="container mx-auto py-16 px-4">
-        <h2 class="text-3xl font-bold text-center text-gray mb-8">Upcoming Events</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div class="bg-gray-800 bg-opacity-80 shadow-md rounded-lg overflow-hidden">
-                <img src="https://via.placeholder.com/400x200" alt="Event" class="w-full">
-                <div class="p-4">
-                    <h3 class="text-xl font-bold text-white">TechFest 2025</h3>
-                    <p class="mt-2 text-gray-300">An exciting technology fest showcasing innovative projects and ideas.</p>
-                    <button class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Register</button>
+    <h2 class="text-4xl font-bold text-center text-gray-100 mb-12 tracking-wide">Upcoming Events</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <?php 
+        require_once('./serverScript/DataBase.php');
+         $query = "SELECT * FROM Events ORDER BY EventDate DESC";
+         $con = Connect_Database();
+         $result = mysqli_query($con, $query);
+         
+         // Check if there are any events in the database
+         if (mysqli_num_rows($result) > 0) {
+             $events = mysqli_fetch_all($result, MYSQLI_ASSOC);
+         } else {
+             $events = [];
+             
+         }
+        foreach ($events as $event): ?>
+            <div class="bg-gray-800 bg-opacity-90 shadow-lg rounded-xl overflow-hidden transition-transform transform hover:scale-105">
+                <img src="https://via.placeholder.com/400x200" alt="Event" class="w-full h-48 object-cover">
+                <div class="p-6">
+                    <h3 class="text-2xl font-semibold text-white"><?= htmlspecialchars($event['EventName']) ?></h3>
+                    <p class="mt-3 text-gray-300 leading-relaxed"><?= htmlspecialchars($event['EventDescription']) ?></p>
+                    <button 
+                        onclick="openEventModal(<?php echo htmlspecialchars($event['EventID']); ?>)" 
+                        class="mt-6 w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                        Read More
+                    </button>
                 </div>
             </div>
+        <?php endforeach; ?>
+    </div>
+
+    <!-- Modal for event details -->
+    <div id="eventModal" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-75 flex items-center justify-center">
+    <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-3/4 max-w-lg">
+        <h3 id="modalEventName" class="text-2xl font-bold mb-4"></h3>
+        <p id="modalEventDescription" class="text-gray-300 mb-4"></p>
+        <p id="modalEventDate" class="text-gray-300 mb-4"></p>
+        <p id="modalEventLocation" class="text-gray-300 mb-4"></p>
+        <p id="modalEventOrganizer" class="text-gray-300 mb-4"></p>
+        <p id="modalEventRules" class="text-gray-300 mb-4"></p>
+
+        <!-- Registration Form -->
+        <form action="./serverScript/Handling.php" method="POST" class="mt-6">
+            <input type="hidden" name="EventID" id="registerEventID">
+            <button type="submit" name="event_reg" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full mb-4">
+                Register for Event
+            </button>
+        </form>
+
+        <button onclick="closeModal()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition w-full">
+            Close
+        </button>
+    </div>
+</div>
+
+    <!-- Registration Form Modal -->
+    <div id="registerModal" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-75 flex items-center justify-center">
+        <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-3/4 max-w-lg">
+            <h3 class="text-2xl font-bold mb-4">Register for Event</h3>
+            <form action="register_event.php" method="POST" id="registerForm">
+                <input type="hidden" id="hiddenEventID" name="EventID">
+                <input type="text" id="registerName" name="name" placeholder="Your Name" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 mb-4" required>
+                <input type="email" id="registerEmail" name="email" placeholder="Your Email" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 mb-4" required>
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition w-full">Submit</button>
+            </form>
+            <button onclick="closeModal()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition w-full mt-4">
+                Close
+            </button>
         </div>
-    </section>
+    </div>
+</section>
 
 
     <section id="about" class="py-16 bg-gray-900 bg-opacity-75 text-white">
@@ -80,20 +144,20 @@ $name = $ $_SESSION['user_name'] ;
 
     <section id="contact" class="container mx-auto py-16">
         <h2 class="text-3xl font-bold text-white text-center mb-8">Contact Us</h2>
-        <form class="max-w-lg mx-auto bg-gray-800 bg-opacity-80 p-6 shadow-md rounded-lg">
+        <form class="max-w-lg mx-auto bg-gray-800 bg-opacity-80 p-6 shadow-md rounded-lg" action="./serverScript/Handling.php" method="POST">
             <div class="mb-4">
                 <label for="name" class="block text-white">Name</label>
-                <input type="text" id="name" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" placeholder="Your Name">
+                <input type="text" name="name" id="name" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" placeholder="Your Name">
             </div>
             <div class="mb-4">
                 <label for="email" class="block text-white">Email</label>
-                <input type="email" id="email" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" placeholder="Your Email">
+                <input type="email" name="email" id="email" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" placeholder="Your Email">
             </div>
             <div class="mb-4">
                 <label for="message" class="block text-white">Message</label>
-                <textarea id="message" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" placeholder="Your Message"></textarea>
+                <textarea id="message" name="message" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" placeholder="Your Message"></textarea>
             </div>
-            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Send</button>
+            <button type="submit" name="send_message" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Send</button>
         </form>
     </section>
  
@@ -104,6 +168,51 @@ $name = $ $_SESSION['user_name'] ;
         menuBtn.addEventListener('click', () => {
             mobileMenu.classList.toggle('hidden');
         });
+    var events = <?php echo json_encode($events); ?>;
+
+ // Function to open the event modal
+// Function to open the event modal and fetch event details
+function openEventModal(eventID) {
+    fetch(`./serverScript/fetch_events.php?EventID=${eventID}`)
+        .then(response => response.json())
+        .then(event => {
+            if (event.error) {
+                alert(event.error);
+                return;
+            }
+
+            // Populate modal details
+            document.getElementById("modalEventName").textContent = event.EventName;
+            document.getElementById("modalEventDescription").textContent = event.EventDescription;
+            document.getElementById("modalEventDate").textContent = "Date: " + event.EventDate;
+            document.getElementById("modalEventLocation").textContent = "Location: " + event.Location;
+            document.getElementById("modalEventOrganizer").textContent = "Organizer: " + event.Organizer;
+            document.getElementById("modalEventRules").textContent = "Rules: " + event.rules;
+
+            // Set EventID in the form
+            document.getElementById("registerEventID").value = eventID;
+
+            // Show the modal
+            document.getElementById("eventModal").classList.remove("hidden");
+        })
+        .catch(error => {
+            console.error("Error fetching event details:", error);
+            alert("Failed to fetch event details. Please try again.");
+        });
+}
+
+
+// Function to close the modal
+function closeModal() {
+    document.getElementById("eventModal").classList.add("hidden");
+}
+
+// Placeholder function for the registration form
+function openRegisterForm() {
+    alert("Registration form functionality is not implemented yet!"); // Placeholder
+}
+
+
     </script>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@1.6.5/dist/flowbite.min.js"></script>
 </body>
