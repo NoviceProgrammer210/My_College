@@ -70,42 +70,52 @@
 
             <!-- Add Event Section -->
             <section id="add-event" class="container mx-auto py-16">
-                <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Add Event</h2>
-                <form method="POST" action="./serverScriptAdmin/Handling.php" class="max-w-lg mx-auto bg-gray-800 bg-opacity-80 p-6 shadow-md rounded-lg">
-                    <div class="mb-4">
-                        <label for="event_name" class="block text-white">Event Name</label>
-                        <input type="text" id="event_name" name="event_name" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="event_description" class="block text-white">Event Description</label>
-                        <textarea id="event_description" name="event_description" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required></textarea>
-                    </div>
-                    <div class="mb-4">
-                        <label for="event_date" class="block text-white">Event Date</label>
-                        <input type="date" id="event_date" name="event_date" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="event_time" class="block text-white">Event Time</label>
-                        <input type="time" id="event_time" name="event_time" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="location" class="block text-white">Location</label>
-                        <input type="text" id="location" name="location" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="organizer" class="block text-white">Organizer</label>
-                        <input type="text" id="organizer" name="organizer" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
-                    </div>
-                    <div class="mb-4">
-                        <label for="rules" class="block text-white">Rules</label>
-                        <textarea id="rules" name="rules" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500"></textarea>
-                    </div>
-                    <button type="submit" name="add_event" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Add Event</button>
-                </form>
-            </section>
+    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Add Event</h2>
+    <form method="POST" action="./serverScriptAdmin/Handling.php" class="max-w-lg mx-auto bg-gray-800 bg-opacity-80 p-6 shadow-md rounded-lg">
+        <div class="mb-4">
+            <label for="event_name" class="block text-white">Event Name</label>
+            <input type="text" id="event_name" name="event_name" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="mb-4">
+            <label for="event_description" class="block text-white">Event Description</label>
+            <textarea id="event_description" name="event_description" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required></textarea>
+        </div>
+        <div class="mb-4">
+            <label for="event_date" class="block text-white">Event Date</label>
+            <input type="date" id="event_date" name="event_date" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="mb-4">
+            <label for="event_time" class="block text-white">Event Time</label>
+            <input type="time" id="event_time" name="event_time" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="mb-4">
+            <label for="location" class="block text-white">Location</label>
+            <input type="text" id="location" name="location" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="mb-4">
+            <label for="organizer" class="block text-white">Organizer</label>
+            <input type="text" id="organizer" name="organizer" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
+        </div>
+        <div class="mb-4">
+            <label for="rules" class="block text-white">Rules</label>
+            <textarea id="rules" name="rules" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+        <div class="mb-4">
+            <label for="event_type" class="block text-white">Event Type</label>
+            <select id="event_type" name="event_type" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" onchange="toggleMaxParticipants()" required>
+                <option value="Single">Single</option>
+                <option value="Group">Group</option>
+            </select>
+        </div>
+        <div class="mb-4 hidden" id="max_participants_container">
+            <label for="max_participants" class="block text-white">Maximum Participants (Group Event Only)</label>
+            <input type="number" id="max_participants" name="max_participants" min="1" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500">
+        </div>
+        <button type="submit" name="add_event" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Add Event</button>
+    </form>
+</section>
 
-
-            <section id="view-events" class="container mx-auto py-16">
+<section id="view-events" class="container mx-auto py-16">
     <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Event List</h2>
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         <?php
@@ -114,10 +124,13 @@
         $result = mysqli_query($con, $query);
 
         while ($row = mysqli_fetch_assoc($result)) {
+            $eventType = $row['EventType'];
+            $maxParticipants = $eventType === 'Group' ? " | Max Participants: {$row['MaxParticipants']}" : "";
             echo "
             <div class='bg-gray-800 bg-opacity-80 shadow-md rounded-lg overflow-hidden'>
                 <div class='p-4'>
                     <h3 class='text-xl font-bold text-white'>{$row['EventName']}</h3>
+                    <p class='mt-2 text-gray-300'><strong>Type:</strong> {$eventType}{$maxParticipants}</p>
                     <p class='mt-2 text-gray-300'><strong>Date:</strong> {$row['EventDate']} | <strong>Time:</strong> {$row['EventTime']}</p>
                     <p class='mt-2 text-gray-300'><strong>Location:</strong> {$row['Location']}</p>
                     <button onclick=\"viewDetails({$row['EventID']})\" class='mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700'>Read More</button>
@@ -132,19 +145,19 @@
 
     <!-- Modal for Read More -->
     <div id="eventModal" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-75 flex items-center justify-center">
-    <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-3/4 max-w-lg">
-        <h3 id="modalEventName" class="text-2xl font-bold mb-4"></h3>
-        <p id="modalEventDescription" class="text-gray-300 mb-4"></p>
-        <p id="modalEventDetails" class="text-gray-300 mb-4"></p>
-        <p id="modalEventRules" class="text-gray-300 mb-4"></p>
-        <div class="flex justify-between">
-            <button onclick="closeModal()" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Close</button>
-            <button onclick="deleteEvent()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete Event</button>
-            <button onclick="markEventCompleted()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Mark as Completed</button>
+        <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-3/4 max-w-lg">
+            <h3 id="modalEventName" class="text-2xl font-bold mb-4"></h3>
+            <p id="modalEventType" class="text-gray-300 mb-4"></p>
+            <p id="modalEventDescription" class="text-gray-300 mb-4"></p>
+            <p id="modalEventDetails" class="text-gray-300 mb-4"></p>
+            <p id="modalEventRules" class="text-gray-300 mb-4"></p>
+            <div class="flex justify-between">
+                <button onclick="closeModal()" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">Close</button>
+                <button onclick="deleteEvent()" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Delete Event</button>
+                <button onclick="markEventCompleted()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Mark as Completed</button>
+            </div>
         </div>
     </div>
-</div>
-
 </section>
 
 
@@ -209,6 +222,17 @@
 
 let currentEventId = null;
 
+function toggleMaxParticipants() {
+    const eventType = document.getElementById("event_type").value;
+    const maxParticipantsContainer = document.getElementById("max_participants_container");
+
+    if (eventType === "Group") {
+        maxParticipantsContainer.classList.remove("hidden");
+    } else {
+        maxParticipantsContainer.classList.add("hidden");
+        document.getElementById("max_participants").value = ''; // Clear value
+    }
+}
 
 
 function markEventCompleted() {
@@ -247,22 +271,26 @@ function markEventCompleted() {
 
 
 
-function viewDetails(eventId) {
-    fetch(`./serverScriptAdmin/get_event_details.php?event_id=${eventId}`)
+function viewDetails(eventID) {
+    // Make an AJAX call or fetch request to get the event details
+    fetch(`./serverScriptAdmin/get_event_details.php?event_id=${eventID}`)
         .then(response => response.json())
-        .then(data => {
-            currentEventId = eventId;
-            document.getElementById('modalEventName').innerText = data.EventName;
-            document.getElementById('modalEventDescription').innerText = data.EventDescription;
-            document.getElementById('modalEventDetails').innerText = `Date: ${data.EventDate}, Time: ${data.EventTime}, Location: ${data.Location}, Organizer: ${data.Organizer}`;
-            document.getElementById('modalEventRules').innerText = `Rules: ${data.Rules}`;
-            document.getElementById('eventModal').classList.remove('hidden');
-        });
+        .then(event => {
+            document.getElementById("modalEventName").innerText = event.EventName;
+            document.getElementById("modalEventType").innerText = `Type: ${event.EventType}`;
+            if (event.EventType === "Group" && event.MaxParticipants) {
+                document.getElementById("modalEventType").innerText += ` | Max Participants: ${event.MaxParticipants}`;
+            }
+            document.getElementById("modalEventDescription").innerText = `Description: ${event.EventDescription}`;
+            document.getElementById("modalEventDetails").innerText = `Date: ${event.EventDate} | Time: ${event.EventTime} | Location: ${event.Location}`;
+            document.getElementById("modalEventRules").innerText = `Rules: ${event.Rules}`;
+            document.getElementById("eventModal").classList.remove("hidden");
+        })
+        .catch(error => console.error("Error fetching event details:", error));
 }
 
 function closeModal() {
-    document.getElementById('eventModal').classList.add('hidden');
-    currentEventId = null;
+    document.getElementById("eventModal").classList.add("hidden");
 }
 
 function deleteEvent() {

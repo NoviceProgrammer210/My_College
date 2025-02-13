@@ -106,6 +106,7 @@ $name = $_SESSION['user_name'] ;
                     <img src="https://via.placeholder.com/400x200" alt="Event" class="w-full h-48 object-cover">
                     <div class="p-6">
                         <h3 class="text-2xl font-semibold text-white"><?= htmlspecialchars($event['EventName']) ?></h3>
+                        <p class="mt-3 text-gray-300 leading-relaxed"><?= htmlspecialchars($event['EventType']) ?></p>
                         <p class="mt-3 text-gray-300 leading-relaxed"><?= htmlspecialchars($event['EventDescription']) ?></p>
                         <button 
                             onclick="openEventModal(<?php echo htmlspecialchars($event['EventID']); ?>)" 
@@ -126,6 +127,8 @@ $name = $_SESSION['user_name'] ;
         <h3 id="modalEventName" class="text-2xl font-bold mb-4"></h3>
         <p id="modalEventDescription" class="text-gray-300 mb-4"></p>
         <p id="modalEventDate" class="text-gray-300 mb-4"></p>
+        <p id="modalEventType" class="text-gray-300 mb-4"></p>
+        <p id="modalMax" class="text-gray-300 mb-4"></p>
         <p id="modalEventLocation" class="text-gray-300 mb-4"></p>
         <p id="modalEventOrganizer" class="text-gray-300 mb-4"></p>
         <p id="modalEventRules" class="text-gray-300 mb-4"></p>
@@ -224,6 +227,8 @@ function openEventModal(eventID) {
             document.getElementById("modalEventName").textContent = event.EventName;
             document.getElementById("modalEventDescription").textContent = event.EventDescription;
             document.getElementById("modalEventDate").textContent = "Date: " + event.EventDate;
+            document.getElementById("modalEventType").textContent = "Event Type : " + event.EventType;
+            document.getElementById("modalMax").textContent = "Max Participants : " + event.MaxParticipants;
             document.getElementById("modalEventLocation").textContent = "Location: " + event.Location;
             document.getElementById("modalEventOrganizer").textContent = "Organizer: " + event.Organizer;
             document.getElementById("modalEventRules").textContent = "Rules: " + event.rules;
