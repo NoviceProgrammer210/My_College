@@ -77,32 +77,64 @@ function send_message(){
 
 
 function Register_Event(){
+    echo 'iwbdi';
+    $eventID = intval($_POST['EventID']);
+    $eventType = $_POST['EventType']; // 'Single' or 'Group'
+    
     $con = Connect_Database();
-    echo "ok";
-    $EventID = intval($_POST['EventID']);
-    $UserName = htmlspecialchars($_POST['UserName']);
-    $UserEmail = htmlspecialchars($_POST['UserEmail']);
-    echo $UserEmail + "oomo";
-    echo $UserName;
-    $UserID = $_SESSION['user_id'] ?? null;
-    echo $UserID;
-    if ($UserID && $EventID) {
-        $con = Connect_Database();
-        echo "ok";
 
-        // Prepare and execute the query to insert participation details
-        $query = "INSERT INTO Participations (UserID, EventID) VALUES (?, ?)";
-        $stmt = mysqli_prepare($con, $query);
-        mysqli_stmt_bind_param($stmt, "ii", $UserID, $EventID);
+    if ($eventType === 'Single') {
+        $name = mysqli_real_escape_string($con, $_POST['name']);
+        $email = mysqli_real_escape_string($con, $_POST['email']);
 
-        if (mysqli_stmt_execute($stmt)) {
-            echo "<script>alert('Registration successful!'); window.location.href = 'index.php';</script>";
+        // Insert participant into Participants table
+        $query = "INSERT INTO Participants (EventID, ParticipantName, ParticipantEmail) VALUES (?, ?, ?)";
+        $stmt = $con->prepare($query);
+        $stmt->bind_param('iss', $eventID, $name, $email);
+
+        if ($stmt->execute()) {
+            echo "Registration successful for individual event!";
         } else {
-            echo "<script>alert('Error registering for the event. Please try again.'); window.location.href = 'index.php';</script>";
+            echo "Error: " . $stmt->error;
         }
+        $stmt->close();
+    }
+    // Handle Group Registration
+    elseif ($eventType === 'Group') {
+        $teamLeaderName = mysqli_real_escape_string($con, $_POST['team_leader_name']);
+        $teamLeaderEmail = mysqli_real_escape_string($con, $_POST['team_leader_email']);
+        $members = json_decode($_POST['members'], true); // Array of members with name and email
 
-        mysqli_stmt_close($stmt);
-        mysqli_close($con);}
+        // Insert team leader into Teams table
+        $query = "INSERT INTO Teams (EventID, TeamLeaderName, TeamLeaderEmail) VALUES (?, ?, ?)";
+        $stmt = $con->prepare($query);
+        $stmt->bind_param('iss', $eventID, $teamLeaderName, $teamLeaderEmail);
+
+        if ($stmt->execute()) {
+            $teamID = $stmt->insert_id;
+
+            // Insert team members into TeamMembers table
+            $memberQuery = "INSERT INTO TeamMembers (TeamID, MemberName, MemberEmail) VALUES (?, ?, ?)";
+            $memberStmt = $con->prepare($memberQuery);
+
+            foreach ($members as $member) {
+                $memberName = mysqli_real_escape_string($con, $member['name']);
+                $memberEmail = mysqli_real_escape_string($con, $member['email']);
+                $memberStmt->bind_param('iss', $teamID, $memberName, $memberEmail);
+                $memberStmt->execute();
+            }
+
+            echo "Group registration successful!";
+            $memberStmt->close();
+        } else {
+            echo "Error: " . $stmt->error;
+        }
+        $stmt->close();
+    } else {
+        echo "Invalid event type!";
+    }
+
+    $con->close();
     }
 
 

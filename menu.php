@@ -134,36 +134,48 @@ $name = $_SESSION['user_name'] ;
         <p id="modalEventRules" class="text-gray-300 mb-4"></p>
 
         <!-- Registration Button -->
-<form method="POST" class="mt-6">
+        <form method="POST" class="mt-6">
     <input type="hidden" name="EventID" id="registerEventID">
-    <button type="button" onclick="openRegisterModal(<?php echo $event['EventID']; ?>)" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full mb-4">
-    Register for Event
-</button>
+    <button 
+        type="button" 
+        onclick="openRegisterModal(<?php echo $event['EventID']; ?>, '<?php echo $event['EventType']; ?>')" 
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition w-full mb-4">
+        Register for Event
+    </button>
 
+    <button onclick="closeEventModal()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition w-full mt-4">
+            Close
+        </button>
 </form>
 
-
-        <button onclick="closeModal()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition w-full">
+<!-- Register Modal -->
+<div id="registerModal" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-75 flex items-center justify-center">
+    <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-3/4 max-w-lg">
+        <h3 class="text-2xl font-bold mb-4">Register for Event</h3>
+        <form action="./serverScript/Handling.php" method="POST" id="registerForm">
+            <input type="hidden" id="hiddenEventID" name="EventID">
+            <div id="individualFields">
+                <input type="text" name="name" placeholder="Your Name" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 mb-4" required>
+                <input type="email" name="email" placeholder="Your Email" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 mb-4" required>
+            </div>
+            <div id="groupFields" class="hidden">
+                <input type="text" name="team_leader_name" placeholder="Team Leader Name" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 mb-4">
+                <input type="email" name="team_leader_email" placeholder="Team Leader Email" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 mb-4">
+                <div id="teamMembers" class="space-y-4"></div>
+                <button type="button" onclick="addTeamMemberField()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition mb-4">
+                    Add Team Member
+                </button>
+            </div>
+            <button type="submit" name="event_reg" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition w-full">
+                Submit
+            </button>
+        </form>
+        <button onclick="closeRegisterModal()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition w-full mt-4">
             Close
         </button>
     </div>
 </div>
 
-    <!-- Registration Form Modal -->
-    <div id="registerModal" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-75 flex items-center justify-center">
-        <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-3/4 max-w-lg">
-            <h3 class="text-2xl font-bold mb-4">Register for Event</h3>
-            <form action="./serverScript/Handling.php" method="POST" id="registerForm">
-                <input type="hidden" id="hiddenEventID" name="EventID">
-                <input type="text" id="registerName" name="name" placeholder="Your Name" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 mb-4" required>
-                <input type="email" id="registerEmail" name="email" placeholder="Your Email" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 mb-4" required>
-                <button type="submit" name="event_reg" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition w-full">Submit</button>
-            </form>
-            <button onclick="closeRegModal()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition w-full mt-4">
-                Close
-            </button>
-        </div>
-    </div>
 </section>
 
 
@@ -246,24 +258,79 @@ function openEventModal(eventID) {
 }
 
 
-function openRegisterModal(eventID) {
-    document.getElementById('hiddenEventID').value = eventID;
-    document.getElementById('registerModal').classList.remove('hidden');
+// Open the Register Modal
+function openRegisterModal(eventID, eventType) {
+    const modal = document.getElementById('registerModal');
+    const hiddenEventID = document.getElementById('hiddenEventID');
+    const groupFields = document.getElementById('groupFields');
+
+    hiddenEventID.value = eventID;
+
+    if (eventType === 'Group') {
+        groupFields.classList.remove('hidden'); // Show group-specific input fields
+    } else {
+        groupFields.classList.add('hidden'); // Hide group-specific input fields
+    }
+
+    modal.classList.remove('hidden');
 }
 
-function closeRegModal() {
-    document.getElementById('registerModal').classList.add('hidden');
+// Close the Register Modal
+function closeRegisterModal() {
+    const modal = document.getElementById('registerModal');
+    modal.classList.add('hidden');
 }
 
-
-// Function to close the modal
-function closeModal() {
+// Close the Event Details Modal
+function closeEventModal() {
     document.getElementById("eventModal").classList.add("hidden");
 }
 
-// Placeholder function for the registration form
-function openRegisterForm() {
-    alert("Registration form functionality is not implemented yet!"); // Placeholder
+// Dynamically Add Team Member Fields
+function addTeamMemberField() {
+    const memberContainer = document.getElementById('teamMembers');
+    const memberIndex = memberContainer.childElementCount + 1;
+
+    const memberDiv = document.createElement('div');
+    memberDiv.classList.add('flex', 'space-x-4', 'mb-4');
+    memberDiv.innerHTML = `
+        <input type="text" name="members[${memberIndex}][name]" placeholder="Member Name" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
+        <input type="email" name="members[${memberIndex}][email]" placeholder="Member Email" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
+        <button type="button" onclick="removeTeamMemberField(this)" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">Remove</button>
+    `;
+    memberContainer.appendChild(memberDiv);
+}
+
+// Remove Team Member Field
+function removeTeamMemberField(button) {
+    button.parentElement.remove();
+}
+
+
+
+
+
+
+
+function renderTeamMemberInputs() {
+    const teamSize = parseInt(document.getElementById("teamSize").value);
+    const teamMembersDiv = document.getElementById("teamMembers");
+    teamMembersDiv.innerHTML = "";
+
+    for (let i = 1; i <= teamSize; i++) {
+        const memberDiv = document.createElement("div");
+        memberDiv.classList.add("mb-4");
+
+        memberDiv.innerHTML = `
+            <label class="block mb-2">Team Member ${i} Name</label>
+            <input type="text" name="team_member_name_${i}" placeholder="Name of Member ${i}" 
+                class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500 mb-2" required>
+            <label class="block mb-2">Team Member ${i} Email</label>
+            <input type="email" name="team_member_email_${i}" placeholder="Email of Member ${i}" 
+                class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
+        `;
+        teamMembersDiv.appendChild(memberDiv);
+    }
 }
 
 
