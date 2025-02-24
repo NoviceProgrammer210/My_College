@@ -44,6 +44,7 @@ function login(){
             $_SESSION['logged_in'] = TRUE;
             $_SESSION['user_id'] = $user['ID'];
             $_SESSION['user_name'] = $user['Name'];
+            $_SESSION['Email']=$user['Email'];
             header("Location: ../menu.php");
             exit();
         } else {
@@ -75,22 +76,19 @@ function send_message(){
     $conn->close();
 }
 
-
-function Register_Event(){
-    echo 'iwbdi';
+function Register_Event() {
     $eventID = intval($_POST['EventID']);
     $eventType = $_POST['EventType']; // 'Single' or 'Group'
-    
+
     $con = Connect_Database();
 
     if ($eventType === 'Single') {
-        $name = mysqli_real_escape_string($con, $_POST['name']);
-        $email = mysqli_real_escape_string($con, $_POST['email']);
+        $userID = intval($_SESSION['UserID']); // Assuming logged-in user info is stored in session
 
-        // Insert participant into Participants table
-        $query = "INSERT INTO Participants (EventID, ParticipantName, ParticipantEmail) VALUES (?, ?, ?)";
+        // Insert participation record for individual
+        $query = "INSERT INTO Participation (UserID, EventID) VALUES (?, ?)";
         $stmt = $con->prepare($query);
-        $stmt->bind_param('iss', $eventID, $name, $email);
+        $stmt->bind_param('ii', $userID, $eventID);
 
         if ($stmt->execute()) {
             echo "Registration successful for individual event!";
@@ -101,14 +99,13 @@ function Register_Event(){
     }
     // Handle Group Registration
     elseif ($eventType === 'Group') {
-        $teamLeaderName = mysqli_real_escape_string($con, $_POST['team_leader_name']);
-        $teamLeaderEmail = mysqli_real_escape_string($con, $_POST['team_leader_email']);
+        $userID = intval($_SESSION['UserID']); // Team leader (logged-in user)
         $members = json_decode($_POST['members'], true); // Array of members with name and email
 
-        // Insert team leader into Teams table
-        $query = "INSERT INTO Teams (EventID, TeamLeaderName, TeamLeaderEmail) VALUES (?, ?, ?)";
+        // Insert team leader's participation
+        $query = "INSERT INTO Participations (UserID, EventID) VALUES (?, ?)";
         $stmt = $con->prepare($query);
-        $stmt->bind_param('iss', $eventID, $teamLeaderName, $teamLeaderEmail);
+        $stmt->bind_param('ii', $userID, $eventID);
 
         if ($stmt->execute()) {
             $teamID = $stmt->insert_id;
@@ -135,8 +132,7 @@ function Register_Event(){
     }
 
     $con->close();
-    }
-
+}
 
 
 
