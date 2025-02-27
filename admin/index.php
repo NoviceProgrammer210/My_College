@@ -10,7 +10,6 @@
 
 <body class="bg-gray-100">
 
-    <!-- Header -->
     <header class="bg-gray-800 text-white py-4">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold">Admin Panel</h1>
