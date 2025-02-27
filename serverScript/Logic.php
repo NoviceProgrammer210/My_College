@@ -77,16 +77,17 @@ function send_message(){
 }
 
 function Register_Event() {
-    $eventID = intval($_POST['EventID']);
-    $eventType = $_POST['EventType']; // 'Single' or 'Group'
 
+    $eventID = intval($_POST['EventID']);
+    $eventType = $_POST['EventType']; 
+    
     $con = Connect_Database();
 
     if ($eventType === 'Single') {
-        $userID = intval($_SESSION['UserID']); // Assuming logged-in user info is stored in session
-
-        // Insert participation record for individual
-        $query = "INSERT INTO Participation (UserID, EventID) VALUES (?, ?)";
+        $userID = intval($_SESSION['user_id']);
+echo $_SESSION['user_id'];
+echo $userID;
+        $query = "INSERT INTO Participations(UserID, EventID, RegisteredAt) VALUES (?, ?, NOW())";
         $stmt = $con->prepare($query);
         $stmt->bind_param('ii', $userID, $eventID);
 
@@ -97,37 +98,42 @@ function Register_Event() {
         }
         $stmt->close();
     }
-    // Handle Group Registration
     elseif ($eventType === 'Group') {
-        $userID = intval($_SESSION['UserID']); // Team leader (logged-in user)
-        $members = json_decode($_POST['members'], true); // Array of members with name and email
+        $userID = intval($_SESSION['UserID']); 
+        $members = json_decode($_POST['members'], true); 
 
-        // Insert team leader's participation
-        $query = "INSERT INTO Participations (UserID, EventID) VALUES (?, ?)";
+        $query = "INSERT INTO Participations (UserID, EventID, RegisteredAt) VALUES (?, ?, NOW())";
+
         $stmt = $con->prepare($query);
+
         $stmt->bind_param('ii', $userID, $eventID);
 
         if ($stmt->execute()) {
-            $teamID = $stmt->insert_id;
 
-            // Insert team members into TeamMembers table
-            $memberQuery = "INSERT INTO TeamMembers (TeamID, MemberName, MemberEmail) VALUES (?, ?, ?)";
+            $participationID = $stmt->insert_id; 
+
+            $memberQuery = "INSERT INTO TeamMembers (ParticipationID, MemberName, MemberEmail, RegisteredAt) VALUES (?, ?, ?, NOW())";
             $memberStmt = $con->prepare($memberQuery);
 
             foreach ($members as $member) {
-                $memberName = mysqli_real_escape_string($con, $member['name']);
-                $memberEmail = mysqli_real_escape_string($con, $member['email']);
-                $memberStmt->bind_param('iss', $teamID, $memberName, $memberEmail);
-                $memberStmt->execute();
+                $memberName = mysqli_real_escape_string($con, $member['mem_name']);
+                $memberEmail = mysqli_real_escape_string($con, $member['mem_email']);
+
+                $memberStmt->bind_param('iss', $participationID, $memberName, $memberEmail);
+                if (!$memberStmt->execute()) {
+                    echo "Error adding member: " . $memberStmt->error;
+                }
             }
 
             echo "Group registration successful!";
             $memberStmt->close();
         } else {
+
             echo "Error: " . $stmt->error;
         }
         $stmt->close();
     } else {
+
         echo "Invalid event type!";
     }
 

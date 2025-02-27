@@ -3,6 +3,7 @@ session_start();
 require('./serverScript/Logic.php');
 $name = $_SESSION['user_name'] ;
 $email = $_SESSION['Email'];
+
 ?>
 
 <!DOCTYPE html>
@@ -56,7 +57,6 @@ $email = $_SESSION['Email'];
          $con = Connect_Database();
          $result = mysqli_query($con, $query);
          
-         // Check if there are any events in the database
          if (mysqli_num_rows($result) > 0) {
              $events = mysqli_fetch_all($result, MYSQLI_ASSOC);
          } else {
@@ -95,7 +95,6 @@ $email = $_SESSION['Email'];
          $con = Connect_Database();
          $result = mysqli_query($con, $query);
          
-         // Check if there are any events in the database
          if (mysqli_num_rows($result) > 0) {
              $events = mysqli_fetch_all($result, MYSQLI_ASSOC);
          } else {
@@ -122,7 +121,6 @@ $email = $_SESSION['Email'];
         } ?>
     
 
-    <!-- Modal for event details -->
     <div id="eventModal" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-75 flex items-center justify-center">
     <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-3/4 max-w-lg">
         <h3 id="modalEventName" class="text-2xl font-bold mb-4"></h3>
@@ -134,7 +132,6 @@ $email = $_SESSION['Email'];
         <p id="modalEventOrganizer" class="text-gray-300 mb-4"></p>
         <p id="modalEventRules" class="text-gray-300 mb-4"></p>
 
-        <!-- Registration Button -->
         <form method="POST" class="mt-6">
     <input type="hidden" name="EventID" id="registerEventID">
     <button 
@@ -149,7 +146,6 @@ $email = $_SESSION['Email'];
         </button>
 </form>
 
-<!-- Register Modal -->
 <div id="registerModal" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-75 flex items-center justify-center">
     <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-3/4 max-w-lg">
         <h3 class="text-2xl font-bold mb-4">Register for Event</h3>
@@ -157,7 +153,6 @@ $email = $_SESSION['Email'];
             <input type="hidden" id="hiddenEventID" name="EventID">
             <input type="hidden" id="maxParticipants" name="maxParticipants">
             <input type="hidden" id="eventType" name="EventType" value="Single">
-            <!-- Team Leader Information -->
             <div id="teamLeaderInfo" class="mb-4">
                 <p class="text-lg font-semibold">Team Leader: <?php echo $name; ?></p>
                 <p class="text-gray-400">Email: <?php echo $email; ?></p>
@@ -165,7 +160,6 @@ $email = $_SESSION['Email'];
                 <input type="hidden" name="team_leader_email" value="<?php echo $email; ?>">
             </div>
 
-            <!-- Team Members -->
             <div id="groupFields">
                 <div id="teamMembers" class="space-y-4"></div>
                 <button type="button" onclick="addTeamMemberField()" id="addMemberButton" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition mb-4">
@@ -180,7 +174,6 @@ $email = $_SESSION['Email'];
             </button>
         </form>
 
-        <!-- Close Modal -->
         <button onclick="closeRegisterModal()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition w-full mt-4">
             Close
         </button>
@@ -236,8 +229,6 @@ $email = $_SESSION['Email'];
         });
     var events = <?php echo json_encode($events); ?>;
 
- // Function to open the event modal
-// Function to open the event modal and fetch event details
 function openEventModal(eventID) {
     fetch(`./serverScript/fetch_events.php?EventID=${eventID}`)
         .then(response => response.json())
@@ -271,7 +262,6 @@ function openEventModal(eventID) {
 }
 
 
-// Open the Register Modal
 function openRegisterModal(eventID, eventType) {
     document.getElementById("hiddenEventID").value = eventID; // Set the Event ID
     document.getElementById("eventType").value = eventType; // Set the Event Type
@@ -283,31 +273,29 @@ function openRegisterModal(eventID, eventType) {
     document.getElementById("registerModal").classList.remove("hidden");
 }
 
-// Close the Register Modal
 function closeRegisterModal() {
     const modal = document.getElementById('registerModal');
     modal.classList.add('hidden');
 }
 
-// Close the Event Details Modal
 function closeEventModal() {
     document.getElementById("eventModal").classList.add("hidden");
 }
 
-// Dynamically Add Team Member Fields
 function addTeamMemberField() {
     const teamMembersContainer = document.getElementById("teamMembers");
     const maxParticipants = parseInt(document.getElementById("maxParticipants").value);
-    const currentMembers = teamMembersContainer.children.length + 1; // Including the team leader
+    const currentMembers = teamMembersContainer.children.length + 1; // Including leader
 
-    // Check Team Member Limit
     if (currentMembers < maxParticipants) {
         const memberDiv = document.createElement("div");
         memberDiv.classList.add("flex", "space-x-2", "items-center", "mb-2");
 
         memberDiv.innerHTML = `
-            <input type="text" name="team_member_name[]" placeholder="Team Member Name" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
-            <input type="email" name="team_member_email[]" placeholder="Team Member Email" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
+            <input type="text" name="mem_name[]" placeholder="Team Member Name" 
+                   class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
+            <input type="email" name="mem_email[]" placeholder="Team Member Email" 
+                   class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
             <button type="button" onclick="removeTeamMemberField(this)" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
                 Remove
             </button>
@@ -316,8 +304,10 @@ function addTeamMemberField() {
         document.getElementById("errorMsg").classList.add("hidden");
     } else {
         document.getElementById("errorMsg").classList.remove("hidden");
+        document.getElementById("errorMsg").textContent = "Max members reached!";
     }
 }
+
 
 function removeTeamMemberField(button) {
     button.parentElement.remove();

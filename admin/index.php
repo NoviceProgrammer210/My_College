@@ -14,7 +14,7 @@
     <header class="bg-gray-800 text-white py-4">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold">Admin Panel</h1>
-            <a href="logout.php" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</a>
+            <!-- <a href="logout.php" class="bg-red-600 px-4 py-2 rounded hover:bg-red-700">Logout</a> -->
         </div>
     </header>
 
@@ -71,7 +71,7 @@
             <!-- Add Event Section -->
             <section id="add-event" class="container mx-auto py-16">
     <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Add Event</h2>
-    <form method="POST" action="./serverScriptAdmin/Handling.php" class="max-w-lg mx-auto bg-gray-800 bg-opacity-80 p-6 shadow-md rounded-lg">
+    <form method="POST" action="./serverScriptAdmin/Handling.php" enctype="multipart/form-data" class="max-w-lg mx-auto bg-gray-800 bg-opacity-80 p-6 shadow-md rounded-lg">
         <div class="mb-4">
             <label for="event_name" class="block text-white">Event Name</label>
             <input type="text" id="event_name" name="event_name" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required>
@@ -111,9 +111,45 @@
             <label for="max_participants" class="block text-white">Maximum Participants (Group Event Only)</label>
             <input type="number" id="max_participants" name="max_participants" min="1" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500">
         </div>
+        <!-- New Poster Input -->
+        <div class="mb-4">
+            <label for="event_poster" class="block text-white">Event Poster</label>
+            <input type="file" id="event_poster" name="event_poster" accept="image/*" class="w-full px-4 py-2 border border-gray-600 rounded-lg bg-gray-700 text-white focus:ring-2 focus:ring-blue-500" required onchange="previewPoster()">
+            <div id="poster_preview" class="mt-4 hidden">
+                <img id="poster_image" src="#" alt="Poster Preview" class="w-full h-auto rounded-lg shadow-lg">
+            </div>
+        </div>
         <button type="submit" name="add_event" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Add Event</button>
     </form>
 </section>
+
+<script>
+    function toggleMaxParticipants() {
+        const eventType = document.getElementById('event_type').value;
+        const maxParticipantsContainer = document.getElementById('max_participants_container');
+        if (eventType === 'Group') {
+            maxParticipantsContainer.classList.remove('hidden');
+        } else {
+            maxParticipantsContainer.classList.add('hidden');
+        }
+    }
+
+    function previewPoster() {
+        const posterInput = document.getElementById('event_poster');
+        const posterPreview = document.getElementById('poster_preview');
+        const posterImage = document.getElementById('poster_image');
+
+        if (posterInput.files && posterInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                posterImage.src = e.target.result;
+                posterPreview.classList.remove('hidden');
+            };
+            reader.readAsDataURL(posterInput.files[0]);
+        }
+    }
+</script>
+
 
 <section id="view-events" class="container mx-auto py-16">
     <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Event List</h2>
@@ -143,7 +179,6 @@
         ?>
     </div>
 
-    <!-- Modal for Read More -->
     <div id="eventModal" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-75 flex items-center justify-center">
         <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-3/4 max-w-lg">
             <h3 id="modalEventName" class="text-2xl font-bold mb-4"></h3>
@@ -272,7 +307,6 @@ function markEventCompleted() {
 
 
 function viewDetails(eventID) {
-    // Make an AJAX call or fetch request to get the event details
     fetch(`./serverScriptAdmin/get_event_details.php?event_id=${eventID}`)
         .then(response => response.json())
         .then(event => {
