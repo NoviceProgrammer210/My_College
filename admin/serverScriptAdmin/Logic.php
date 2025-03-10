@@ -3,7 +3,8 @@ require ('./DataBase.php');
 
 
 
-function add_event(){
+function add_event()
+{
     $event_name = $_POST['event_name'];
     $event_description = $_POST['event_description'];
     $event_date = $_POST['event_date'];
@@ -11,25 +12,43 @@ function add_event(){
     $location = $_POST['location'];
     $organizer = $_POST['organizer'];
     $rules = $_POST['rules'];
-    $event_type = $_POST['event_type'];
-    $max_participants = $event_type === 'Group' ? intval($_POST['max_participants']) : null;
 
     $con = Connect_Database();
 
-    $query = "INSERT INTO Events (EventName, EventDescription, EventDate, EventTime, Location, Organizer, Rules, EventType, MaxParticipants)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    // Add CreatedAt with the current timestamp
+    $created_at = date("Y-m-d H:i:s");
+
+    $query = "INSERT INTO Events (EventName, EventDescription, EventDate, EventTime, Location, Organizer, Rules, CreatedAt) 
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = mysqli_prepare($con, $query);
-    mysqli_stmt_bind_param($stmt, "ssssssssi", $event_name, $event_description, $event_date, $event_time, $location, $organizer, $rules, $event_type, $max_participants);
+
+    if (!$stmt) {
+        die("Preparation failed: " . mysqli_error($con));
+    }
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        "ssssssss",
+        $event_name,
+        $event_description,
+        $event_date,
+        $event_time,
+        $location,
+        $organizer,
+        $rules,
+        $created_at
+    );
 
     if (mysqli_stmt_execute($stmt)) {
         echo "<script>alert('Event added successfully!'); window.location.href = '../index.php';</script>";
     } else {
-        echo "<script>alert('Error adding event. Please try again.'); window.location.href = '../index.php';</script>";
+        echo "<script>alert('Error adding event: " . mysqli_error($con) . "'); window.location.href = '../index.php';</script>";
     }
 
     mysqli_stmt_close($stmt);
     mysqli_close($con);
 }
+
 
 
 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Feb 27, 2025 at 05:58 PM
+-- Generation Time: Mar 09, 2025 at 04:57 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -48,7 +48,8 @@ CREATE TABLE `completed_events` (
 INSERT INTO `completed_events` (`CompletedEventID`, `EventName`, `EventDescription`, `EventDate`, `EventTime`, `Location`, `Organizer`, `Rules`, `Rating`, `Feedback`, `CompletedAt`) VALUES
 (1, 'Event', 'wojowj', '2025-02-20', '12:31:00', 'Mangalore', 'ojqow', NULL, 9, 'hel', '2025-02-08 12:35:29'),
 (2, 'Event', 'wojowj', '2025-02-20', '12:31:00', 'Mangalore', 'ojqow', NULL, 8, '2', '2025-02-08 12:36:00'),
-(3, 'hi', 'hkvik', '2025-02-21', '06:28:00', 'Udupi', 'kwndw', NULL, 9, 'ok', '2025-02-10 15:46:05');
+(3, 'hi', 'hkvik', '2025-02-21', '06:28:00', 'Udupi', 'kwndw', NULL, 9, 'ok', '2025-02-10 15:46:05'),
+(4, 'Sing', 'leqbfowe', '2025-02-28', '12:04:00', 'Manglore', 'KBdid', NULL, 8, 'we', '2025-03-08 16:07:08');
 
 -- --------------------------------------------------------
 
@@ -91,7 +92,7 @@ CREATE TABLE `Events` (
 
 INSERT INTO `Events` (`EventID`, `EventName`, `EventDescription`, `EventDate`, `EventTime`, `Location`, `Organizer`, `CreatedAt`, `rules`, `EventType`, `MaxParticipants`) VALUES
 (5, 'Dance', 'A dance baila', '2025-02-28', '19:00:00', 'Mangalore', 'Tehc', '2025-02-13 09:02:28', 'Mo rules', 'Group', 4),
-(6, 'Sing', 'leqbfowe', '2025-02-28', '12:04:00', 'Manglore', 'KBdid', '2025-02-27 13:02:35', 'IHEiwe', 'Single', NULL);
+(7, 'DAnceefwef', 'ef', '2026-04-23', '23:04:00', 'Mangalore', 'er', '2025-03-08 15:38:34', 'werd', 'Single', NULL);
 
 -- --------------------------------------------------------
 
@@ -126,6 +127,45 @@ CREATE TABLE `Participations` (
   `ParticipationID` int(11) NOT NULL,
   `UserID` int(11) NOT NULL,
   `EventID` int(11) NOT NULL,
+  `RegisteredAt` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `Participations`
+--
+
+INSERT INTO `Participations` (`ParticipationID`, `UserID`, `EventID`, `RegisteredAt`) VALUES
+(79, 5, 7, '2025-03-09 03:31:17'),
+(80, 5, 7, '2025-03-09 03:32:30'),
+(81, 5, 7, '2025-03-09 03:32:54'),
+(82, 5, 5, '2025-03-09 03:43:06'),
+(83, 6, 7, '2025-03-09 03:51:34');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `TeamMembers`
+--
+
+CREATE TABLE `TeamMembers` (
+  `MemberID` int(11) NOT NULL,
+  `TeamID` int(11) NOT NULL,
+  `MemberName` varchar(255) NOT NULL,
+  `MemberEmail` varchar(255) NOT NULL,
+  `RegisteredAt` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `Teams`
+--
+
+CREATE TABLE `Teams` (
+  `TeamID` int(11) NOT NULL,
+  `EventID` int(11) NOT NULL,
+  `TeamLeaderName` varchar(255) NOT NULL,
+  `TeamLeaderEmail` varchar(255) NOT NULL,
   `RegisteredAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -169,7 +209,8 @@ INSERT INTO `Users` (`UserID`, `Name`, `Email`, `Password`, `CreatedAt`) VALUES
 (2, 'Test', 'AlbertTest@gmail.com', '$2y$10$Na0/ChUs9z4y7G74PluOa.EGYBrEUUUz8OXMqjTWW7nojW.GlszFi', '2025-01-14 04:48:50'),
 (3, 'Joyston', 'Joyston@gmail.com', '$2y$10$u92ChtyK0FJmce.gYVgjR.iM70.UXFGBHMVXfYKy6VVH0LR9iFqQm', '2025-01-14 05:00:59'),
 (4, 'Joyston', 'joyston123@gmail.com', '$2y$10$q0qy2cNhFQOZnzw0wpqocOjkcKEcM/Noh6EwknvWN.c7qInqNSZp.', '2025-02-07 10:07:48'),
-(5, 'Test', 'Test@gmail.com', '$2y$10$L39t1zAJ48xtIajK5Z47uO3ixW7NHGaT316Z3R8XKEaQv4w9YpkRm', '2025-02-08 12:23:15');
+(5, 'Test', 'Test@gmail.com', '$2y$10$L39t1zAJ48xtIajK5Z47uO3ixW7NHGaT316Z3R8XKEaQv4w9YpkRm', '2025-02-08 12:23:15'),
+(6, 'TEST', 'Test1@gmail.com', '$2y$10$QszzHifOrHNNKLyW1AIONeynB9HVKQuIUX3edlZdbOp1knxCkqIp6', '2025-03-09 03:51:11');
 
 --
 -- Indexes for dumped tables
@@ -208,6 +249,20 @@ ALTER TABLE `Participations`
   ADD KEY `EventID` (`EventID`);
 
 --
+-- Indexes for table `TeamMembers`
+--
+ALTER TABLE `TeamMembers`
+  ADD PRIMARY KEY (`MemberID`),
+  ADD KEY `TeamID` (`TeamID`);
+
+--
+-- Indexes for table `Teams`
+--
+ALTER TABLE `Teams`
+  ADD PRIMARY KEY (`TeamID`),
+  ADD KEY `EventID` (`EventID`);
+
+--
 -- Indexes for table `UpcomingEvents`
 --
 ALTER TABLE `UpcomingEvents`
@@ -228,7 +283,7 @@ ALTER TABLE `Users`
 -- AUTO_INCREMENT for table `completed_events`
 --
 ALTER TABLE `completed_events`
-  MODIFY `CompletedEventID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `CompletedEventID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `contact_messages`
@@ -240,7 +295,7 @@ ALTER TABLE `contact_messages`
 -- AUTO_INCREMENT for table `Events`
 --
 ALTER TABLE `Events`
-  MODIFY `EventID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `EventID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `history`
@@ -252,7 +307,19 @@ ALTER TABLE `history`
 -- AUTO_INCREMENT for table `Participations`
 --
 ALTER TABLE `Participations`
-  MODIFY `ParticipationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=70;
+  MODIFY `ParticipationID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
+
+--
+-- AUTO_INCREMENT for table `TeamMembers`
+--
+ALTER TABLE `TeamMembers`
+  MODIFY `MemberID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `Teams`
+--
+ALTER TABLE `Teams`
+  MODIFY `TeamID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `UpcomingEvents`
@@ -264,7 +331,7 @@ ALTER TABLE `UpcomingEvents`
 -- AUTO_INCREMENT for table `Users`
 --
 ALTER TABLE `Users`
-  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `UserID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
@@ -276,6 +343,18 @@ ALTER TABLE `Users`
 ALTER TABLE `Participations`
   ADD CONSTRAINT `Participations_ibfk_1` FOREIGN KEY (`UserID`) REFERENCES `Users` (`UserID`) ON DELETE CASCADE,
   ADD CONSTRAINT `Participations_ibfk_2` FOREIGN KEY (`EventID`) REFERENCES `Events` (`EventID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `TeamMembers`
+--
+ALTER TABLE `TeamMembers`
+  ADD CONSTRAINT `TeamMembers_ibfk_1` FOREIGN KEY (`TeamID`) REFERENCES `Teams` (`TeamID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `Teams`
+--
+ALTER TABLE `Teams`
+  ADD CONSTRAINT `Teams_ibfk_1` FOREIGN KEY (`EventID`) REFERENCES `Events` (`EventID`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -1,5 +1,7 @@
 <?php
 require './DataBase.php';
+if (isset($_GET['event_id'])) {
+    
 
 $eventId = intval($_GET['event_id']);
 $con = Connect_Database();
@@ -18,4 +20,4 @@ if ($row = mysqli_fetch_assoc($result)) {
 
 mysqli_stmt_close($stmt);
 mysqli_close($con);
-?>
+}?>

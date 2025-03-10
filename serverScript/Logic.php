@@ -1,7 +1,6 @@
 <?php
-
-
 session_start();
+
 
 include('./DataBase.php');
 
@@ -28,8 +27,9 @@ function Register(){
     }
 }
 
+function login() {
+    session_start(); // Start the session
 
-function login(){
     $con = Connect_Database();
     $email = mysqli_real_escape_string($con, $_POST['email']);
     $password = $_POST['password'];
@@ -42,9 +42,15 @@ function login(){
 
         if (password_verify($password, $user['Password'])) {
             $_SESSION['logged_in'] = TRUE;
-            $_SESSION['user_id'] = $user['ID'];
+            $_SESSION['user_id'] = $user['UserID'];
             $_SESSION['user_name'] = $user['Name'];
-            $_SESSION['Email']=$user['Email'];
+            $_SESSION['Email'] = $user['Email'];
+
+            // Debugging session data
+            echo "Login successful. Session variables:";
+            print_r($_SESSION);
+
+            // Redirect to menu page
             header("Location: ../menu.php");
             exit();
         } else {
@@ -54,6 +60,7 @@ function login(){
         echo "<h1>User with this email does not exist.</h1>";
     }
 }
+
 
 
 function send_message(){
@@ -69,76 +76,99 @@ function send_message(){
     
     if ($conn->query($sql) === TRUE) {
         echo "Message sent successfully!";
+        header("Location: ../menu.php");
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
 
     $conn->close();
 }
-
 function Register_Event() {
+    session_start();
 
-    $eventID = intval($_POST['EventID']);
-    $eventType = $_POST['EventType']; 
-    
-    $con = Connect_Database();
-
-    if ($eventType === 'Single') {
-        $userID = intval($_SESSION['user_id']);
-echo $_SESSION['user_id'];
-echo $userID;
-        $query = "INSERT INTO Participations(UserID, EventID, RegisteredAt) VALUES (?, ?, NOW())";
-        $stmt = $con->prepare($query);
-        $stmt->bind_param('ii', $userID, $eventID);
-
-        if ($stmt->execute()) {
-            echo "Registration successful for individual event!";
-        } else {
-            echo "Error: " . $stmt->error;
-        }
-        $stmt->close();
+    if (!isset($_SESSION['user_id'])) {
+        echo '<script>alert("Please log in to register for the event."); window.location.href="../login.php";</script>';
+        exit;
     }
-    elseif ($eventType === 'Group') {
-        $userID = intval($_SESSION['UserID']); 
-        $members = json_decode($_POST['members'], true); 
+    $eventID = intval($_POST['EventID']);
+    $userID = intval($_SESSION['user_id']);
 
-        $query = "INSERT INTO Participations (UserID, EventID, RegisteredAt) VALUES (?, ?, NOW())";
+        $con = Connect_Database();
 
-        $stmt = $con->prepare($query);
+    if (!$con) {
+        echo '<script>alert("Failed to connect to the database."); window.location.href="../menu.php";</script>';
+        exit;
+    }
+    echo 'infi';
 
-        $stmt->bind_param('ii', $userID, $eventID);
+    $eventCheckQuery = "SELECT COUNT(*) as count FROM Events WHERE EventID = ?";
+    $eventCheckStmt = $con->prepare($eventCheckQuery);
+    
+    if (!$eventCheckStmt) {
+        die('Prepare failed: ' . $con->error);
+    }
+    
+    $eventCheckStmt->bind_param('i', $eventID);
+    $eventCheckStmt->execute();
+    $eventCheckResult = $eventCheckStmt->get_result();
+    $eventRow = $eventCheckResult->fetch_assoc();
+    echo $eventID;
+        if ($eventRow['count'] === 0) {
+        echo '<script>alert("Invalid EventID. This event does not exist. "); window.location.href="../menu.php";</script>';
+        exit;
+    }
+    $eventCheckStmt->close();
+    
+    // Check if the user is already registered for the event
+    $checkQuery = "SELECT COUNT(*) as count FROM Participations WHERE UserID = ? AND EventID = ?";
+    $checkStmt = $con->prepare($checkQuery);
 
-        if ($stmt->execute()) {
+    if (!$checkStmt) {
+        echo '<script>alert("An error occurred while checking registration. Please try again later."); window.location.href="../menu.php";</script>';
+        exit;
+    }
 
-            $participationID = $stmt->insert_id; 
+    $checkStmt->bind_param('ii', $userID, $eventID);
+    $checkStmt->execute();
+    $checkResult = $checkStmt->get_result();
+    $row = $checkResult->fetch_assoc();
 
-            $memberQuery = "INSERT INTO TeamMembers (ParticipationID, MemberName, MemberEmail, RegisteredAt) VALUES (?, ?, ?, NOW())";
-            $memberStmt = $con->prepare($memberQuery);
+    if ($row['count'] > 0) {
+        $checkStmt->close();
+        echo '<script>alert("You are already registered for this event."); window.location.href="../menu.php";</script>';
+        exit;
+    }
+    
+    $checkStmt->close();
 
-            foreach ($members as $member) {
-                $memberName = mysqli_real_escape_string($con, $member['mem_name']);
-                $memberEmail = mysqli_real_escape_string($con, $member['mem_email']);
+    // Insert the new registration into the database
+    $query = "INSERT INTO Participations(UserID, EventID, RegisteredAt) VALUES (?, ?, NOW())";
+    $stmt = $con->prepare($query);
 
-                $memberStmt->bind_param('iss', $participationID, $memberName, $memberEmail);
-                if (!$memberStmt->execute()) {
-                    echo "Error adding member: " . $memberStmt->error;
-                }
-            }
+    if (!$stmt) {
+        echo '<script>alert("Failed to prepare registration. Please try again later."); window.location.href="../menu.php";</script>';
+        exit;
+    }
+    error_reporting(E_ALL);
+    ini_set('display_errors', 1);
+    
 
-            echo "Group registration successful!";
-            $memberStmt->close();
-        } else {
+    $stmt->bind_param('ii', $userID, $eventID);
 
-            echo "Error: " . $stmt->error;
-        }
-        $stmt->close();
+    if ($stmt->execute()) {
+
+        echo '<script>alert("Successfully registered for the event!"); window.location.href="../menu.php";</script>';
     } else {
 
-        echo "Invalid event type!";
+        echo '<script>alert("Registration failed. Please try again later."); window.location.href="../menu.php";</script>';
     }
 
+    $stmt->close();
     $con->close();
 }
+
+    
+
 
 
 
